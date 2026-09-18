@@ -2,12 +2,12 @@
 CLI entry point.
 
 Usage:
-    python -m signal_engine.main
-    python -m signal_engine.main --universe nifty50 --top 10
-    python -m signal_engine.main --universe watchlist --top 5
+    python main.py
+    python main.py --universe nifty50 --top 10
+    python main.py --universe watchlist --top 5
 
-Run from the project root (the directory that CONTAINS the signal_engine/
-folder), with ALPHA_VANTAGE_API_KEY set in your environment or a .env file.
+Run from the repo root, with ALPHA_VANTAGE_API_KEY set in your environment
+or a .env file.
 """
 
 from __future__ import annotations
@@ -17,8 +17,8 @@ import sys
 
 from tabulate import tabulate
 
-from . import config
-from .signal_engine import SignalEngine
+import config
+from signal_engine import SignalEngine
 
 
 def main():

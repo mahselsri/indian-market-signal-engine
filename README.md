@@ -11,17 +11,18 @@ Market Data -> [SIGNAL ENGINE] -> Candidates -> GROQ AI -> Paper Trader -> Dashb
 ## Setup
 
 ```bash
-cd signal_engine_project        # the folder that CONTAINS the signal_engine/ package
-pip install -r signal_engine/requirements.txt
-cp signal_engine/.env.example .env
+git clone https://github.com/mahselsri/indian-market-signal-engine.git
+cd indian-market-signal-engine
+pip install -r requirements.txt
+cp .env.example .env
 # edit .env and paste in your ALPHA_VANTAGE_API_KEY
 ```
 
 ## Run
 
 ```bash
-python -m signal_engine.main --universe watchlist --top 5
-python -m signal_engine.main --universe nifty50 --top 10
+python main.py --universe watchlist --top 5
+python main.py --universe nifty50 --top 10
 ```
 
 Output: a ranked table in your terminal, plus a JSON file under
@@ -90,18 +91,18 @@ change.
 
 ## Pushing to GitHub
 
+Files live at the repo root (no `signal_engine/` subfolder) — `config.py`,
+`main.py`, `.github/`, etc. are all siblings.
+
 ```bash
-cd signal_engine_project        # the folder you unzipped, containing signal_engine/, .github/, etc.
+cd indian-market-signal-engine   # the folder you unzipped, containing config.py, main.py, .github/, etc.
 git init
 git add .
 git commit -m "Initial commit: signal engine"
 git branch -M main
-git remote add origin https://github.com/<your-username>/<your-repo-name>.git
+git remote add origin https://github.com/mahselsri/indian-market-signal-engine.git
 git push -u origin main
 ```
-
-(Create the empty repo first at github.com/new — don't initialize it with a
-README there, to avoid a merge conflict on first push.)
 
 ## Running on a schedule with GitHub Actions (recommended for this stage)
 

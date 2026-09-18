@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import requests
 
-from . import config
+import config
 
 
 class RateLimiter:

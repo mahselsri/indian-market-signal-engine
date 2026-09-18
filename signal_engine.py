@@ -21,9 +21,10 @@ from typing import Optional
 
 import pandas as pd
 
-from . import config, indicators
-from .data_fetcher import DataFetcher, get_fetcher
-from .symbols import get_universe
+import config
+import indicators
+from data_fetcher import DataFetcher, get_fetcher
+from symbols import get_universe
 
 
 @dataclass

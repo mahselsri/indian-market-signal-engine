@@ -16,7 +16,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from . import config
+import config
 
 
 def typical_price(df: pd.DataFrame) -> pd.Series:

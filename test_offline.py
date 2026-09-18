@@ -1,13 +1,13 @@
 """Not part of the shipped product — a quick offline smoke test using
 synthetic OHLCV data, so the pipeline logic can be validated without
-spending real Alpha Vantage API calls. Run with: python -m signal_engine.test_offline
+spending real Alpha Vantage API calls. Run with: python test_offline.py
 """
 import numpy as np
 import pandas as pd
 
-from . import config
-from .data_fetcher import DataFetcher
-from .signal_engine import SignalEngine
+import config
+from data_fetcher import DataFetcher
+from signal_engine import SignalEngine
 
 
 class FakeFetcher(DataFetcher):
