@@ -29,9 +29,12 @@ DATA_SOURCE = os.getenv("DATA_SOURCE", "alpha_vantage")
 AV_CALLS_PER_MINUTE = int(os.getenv("AV_CALLS_PER_MINUTE", "5"))
 AV_CALLS_PER_DAY = int(os.getenv("AV_CALLS_PER_DAY", "25"))
 
-# How many daily bars to pull per symbol (need enough history for 14-period
-# RSI/ATR and a 52-week high check)
-LOOKBACK_DAYS = int(os.getenv("LOOKBACK_DAYS", "260"))
+# How many daily bars to pull per symbol. Alpha Vantage's free tier only
+# supports outputsize=compact (last ~100 daily bars) — "full" history is a
+# premium-only parameter and every request with it gets rejected. 100 bars
+# is comfortably enough for 14/20-period indicators, so don't raise this
+# above ~100 unless you've upgraded your Alpha Vantage plan.
+LOOKBACK_DAYS = int(os.getenv("LOOKBACK_DAYS", "100"))
 
 # ---------------------------------------------------------------------------
 # Universe

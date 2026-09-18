@@ -33,9 +33,14 @@ just interpret/validate).
 
 ## Important limitations (free tier realities)
 
-1. **Alpha Vantage's free API key is heavily rate-limited** — typically
-   5 requests/minute and 25 requests/day. Scanning all of NIFTY 50 (50
-   symbols) will exceed your daily quota in one run. Options:
+1. **Alpha Vantage's free API key is heavily rate-limited** — 25
+   requests/day, and only `outputsize=compact` (last ~100 daily bars) is
+   available; requesting `full` history is a premium-only parameter and
+   every such request gets rejected outright (this bit us once already —
+   see the fix history in this repo). This code always requests `compact`
+   and paces requests out with a minimum gap between calls. Scanning all
+   of NIFTY 50 (50 symbols) will still exceed a 25/day quota in one run.
+   Options:
    - Use `--universe watchlist` (10 symbols) while developing/testing.
    - Split a full NIFTY50/100 scan across multiple days.
    - Upgrade to a paid Alpha Vantage plan, or move to Zerodha's Kite

@@ -143,6 +143,7 @@ class SignalEngine:
 
         enriched: dict[str, pd.DataFrame] = {}
         returns_by_symbol: dict[str, pd.Series] = {}
+        fetch_failures = 0
 
         for i, symbol in enumerate(self.universe, start=1):
             try:
@@ -155,8 +156,18 @@ class SignalEngine:
                 returns_by_symbol[symbol] = df["daily_return"]
                 print(f"  [{i}/{len(self.universe)}] {symbol}: fetched & computed OK")
             except Exception as e:
+                fetch_failures += 1
                 print(f"  [{i}/{len(self.universe)}] {symbol}: FAILED — {e}")
                 continue
+
+        if fetch_failures > 0 and fetch_failures == len(self.universe):
+            raise RuntimeError(
+                f"All {fetch_failures} symbol(s) failed to fetch — see the FAILED lines "
+                "above for the actual API error (bad/missing API key, exhausted daily "
+                "quota, or an unsupported request parameter are the usual causes). "
+                "Raising an error here so this shows up as a failed run instead of a "
+                "silent no-op."
+            )
 
         benchmark_returns = self._get_benchmark_returns(returns_by_symbol)
 

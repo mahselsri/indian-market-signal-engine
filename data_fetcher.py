@@ -15,7 +15,6 @@ import json
 import time
 import os
 from abc import ABC, abstractmethod
-from collections import deque
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -25,14 +24,16 @@ import config
 
 
 class RateLimiter:
-    """Simple sliding-window rate limiter for calls-per-minute AND a hard
-    calls-per-day cap, so a scan over a big universe fails fast and loudly
-    instead of silently eating your daily quota with error responses."""
+    """Simple rate limiter enforcing BOTH a minimum gap between consecutive
+    calls (so even the very first few calls are spaced out, matching Alpha
+    Vantage's own guidance to pace requests) AND a hard calls-per-day cap,
+    so a scan over a big universe fails fast and loudly instead of quietly
+    burning through error responses."""
 
     def __init__(self, calls_per_minute: int, calls_per_day: int):
-        self.calls_per_minute = calls_per_minute
+        self.min_gap_seconds = 60.0 / calls_per_minute
         self.calls_per_day = calls_per_day
-        self._minute_window: deque = deque()
+        self._last_call_at: float | None = None
         self._day_count = 0
         self._day_started = datetime.now().date()
 
@@ -51,15 +52,13 @@ class RateLimiter:
             )
 
         now = time.monotonic()
-        while self._minute_window and now - self._minute_window[0] > 60:
-            self._minute_window.popleft()
+        if self._last_call_at is not None:
+            elapsed = now - self._last_call_at
+            remaining = self.min_gap_seconds - elapsed
+            if remaining > 0:
+                time.sleep(remaining)
 
-        if len(self._minute_window) >= self.calls_per_minute:
-            sleep_for = 60 - (now - self._minute_window[0]) + 0.1
-            if sleep_for > 0:
-                time.sleep(sleep_for)
-
-        self._minute_window.append(time.monotonic())
+        self._last_call_at = time.monotonic()
         self._day_count += 1
 
 
@@ -121,7 +120,11 @@ class AlphaVantageFetcher(DataFetcher):
         params = {
             "function": "TIME_SERIES_DAILY",
             "symbol": symbol,
-            "outputsize": "full" if config.LOOKBACK_DAYS > 100 else "compact",
+            # "full" history is a premium-only parameter on Alpha Vantage's
+            # free tier (every request with it gets rejected) — "compact"
+            # (last 100 daily bars) is what free keys are entitled to, and
+            # is comfortably enough history for 14/20-period indicators.
+            "outputsize": "compact",
             "apikey": self.api_key,
         }
         resp = requests.get(self.BASE_URL, params=params, timeout=30)
